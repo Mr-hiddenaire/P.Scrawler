@@ -10,3 +10,9 @@ Two:
     1. download google chrome - v: 78.0.3904.108
     2. download chrome driver - v:
 
+Note:
+To use chrome driver without headless instead of xvfb
+Below is configuration of xvfb
+1. nohup Xvfb -ac :7 -screen 0 1280x1024x8 > /dev/null 2>&1 &
+2. export DISPLAY=:7
+
