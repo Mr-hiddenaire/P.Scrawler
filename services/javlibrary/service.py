@@ -118,6 +118,7 @@ def do_original_source_scrawler_with_selenium(url, driver):
         print('no')
         pass
 
+    print(driver.page_source)
     exit(90)
     parse_columns_with_selenium(driver.page_source, driver)
 
