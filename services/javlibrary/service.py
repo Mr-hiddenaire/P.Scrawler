@@ -7,6 +7,7 @@ from services.searcher import torrent_searcher
 from utils.selenium.chrome import browser
 import time
 from random import randint
+from selenium.common.exceptions import NoSuchElementException
 
 
 def parse_columns(origin_html_list):
@@ -109,6 +110,15 @@ def do_original_source_scrawler_with_selenium(url, driver):
 
     time.sleep(5)
 
+    try :
+        driver.find_element_by_id('#recaptcha-anchor')
+        driver.find_element_by_class_name('recaptcha-checkbox-borderAnimation').click()
+        print('yes')
+    except NoSuchElementException:
+        print('no')
+        pass
+
+    exit(90)
     parse_columns_with_selenium(driver.page_source, driver)
 
 
