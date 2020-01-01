@@ -112,7 +112,7 @@ def do_original_source_scrawler_with_selenium(url, driver):
 
     try :
         driver.find_element_by_id('#recaptcha-anchor')
-        driver.find_element_by_class_name('recaptcha-checkbox-borderAnimation').click()
+        #driver.find_element_by_class_name('recaptcha-checkbox-borderAnimation').click()
         print('yes')
     except NoSuchElementException:
         print('no')
