@@ -1,0 +1,12 @@
+Break defence protection
+
+Which files in git ignore file should be to rsync are below:
+One:
+    1. database
+    2. searcher
+    3. base
+    4. coordinate
+Two:
+    1. download google chrome - v: 78.0.3904.108
+    2. download chrome driver - v:
+
