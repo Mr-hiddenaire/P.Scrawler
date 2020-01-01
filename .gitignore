@@ -1,13 +1,13 @@
 .idea/*
 venv/*
-assets/*
 route/flask.log
 config/__pycache__/*
 services/__pycache__/*
 services/cloudflare/__pycache__/*
 log.log
 test.py
-
+torrent/*
+images/*
 *.pyc
 config/*.pyc
 models/*.pyc
