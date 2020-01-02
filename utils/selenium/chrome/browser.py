@@ -7,7 +7,7 @@ from config import base
 def get_driver():
     chrome_options = Options()
 
-    chrome_options.add_argument("--headless")
+    #chrome_options.add_argument("--headless")
     chrome_options.add_argument("--window-size=1280x1024")
     chrome_options.add_argument("--disable-notifications")
     chrome_options.add_argument('--no-sandbox')
