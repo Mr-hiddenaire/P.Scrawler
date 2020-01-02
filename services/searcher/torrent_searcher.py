@@ -45,6 +45,8 @@ def find_torrent(unique_id, driver):
 
 
 def torrent_download(torrent_url, driver):
+    torrent_url = 'https://rarbg.to/download.php?id=kabjy5z&h=8f4&f=TUSHY%20-%20Riley%20Steele%20And%20Natalia%20Starr%20-%20The%20Perfect%20Wife%202%2001.01.2020%20mp4-[rarbg.to].torrent'
+
     extension_list = ['.torrent']
     counter = 1
 
@@ -64,6 +66,9 @@ def torrent_download(torrent_url, driver):
 
     driver.get(torrent_url)
 
+    time.sleep(10)
+    print('done and to see whether file downloaded or not')
+    exit(9)
     while True:
         time.sleep(1)
 
