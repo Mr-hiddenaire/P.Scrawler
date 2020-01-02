@@ -81,8 +81,10 @@ def torrent_download(torrent_url, driver):
         if len(torrent_filename_list) <= 0:
             continue
         else:
-            print('Done loading')
-            exit()
+            if counter == 9:
+                print(torrent_filename_list)
+                print('Done loading')
+                exit()
             original_torrent_filename = torrent_filename_list[0]
             filename, extension = os.path.splitext(original_torrent_filename)
 
