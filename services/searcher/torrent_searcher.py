@@ -9,6 +9,7 @@ import os
 from utils import tool
 import time
 from random import randint
+import html
 
 
 def find_torrent(unique_id, driver):
@@ -61,6 +62,8 @@ def torrent_download(torrent_url, driver):
         raise FileNotFoundError('Download torrent directory does not exists')
 
     browser.enable_download_in_headless_chrome(driver, download_torrent_tmp_path)
+
+    print(torrent_url)
 
     driver.get(torrent_url)
 

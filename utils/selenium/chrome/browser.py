@@ -7,22 +7,7 @@ from config import base
 def get_driver():
     chrome_options = Options()
 
-    #chrome_options.add_argument("--headless")
-    chrome_options.add_argument("--window-size=1280x1024")
-    chrome_options.add_argument("--disable-notifications")
     chrome_options.add_argument('--no-sandbox')
-    chrome_options.add_argument('--verbose')
-
-    chrome_options.add_experimental_option("prefs", {
-        "download.default_directory": "/data/www/P.Scrawler/torrent/tmp",
-        "download.prompt_for_download": False,
-        "download.directory_upgrade": True,
-        "safebrowsing_for_trusted_sources_enabled": False,
-        "safebrowsing.enabled": False
-    })
-
-    chrome_options.add_argument('--disable-gpu')
-    chrome_options.add_argument('--disable-software-rasterizer')
 
     driver = webdriver.Chrome(get_driver_path(), chrome_options=chrome_options)
 
