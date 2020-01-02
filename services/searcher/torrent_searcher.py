@@ -73,6 +73,8 @@ def torrent_download(torrent_url, driver):
 
         if counter > 10:
             driver.save_screenshot('test.png')
+            print(driver.title)
+            exit(9)
             return None
 
         counter = counter + 1
