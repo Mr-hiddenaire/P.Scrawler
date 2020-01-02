@@ -1,22 +1,11 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 import os
-from config import base
 
 
 def get_driver():
     chrome_options = Options()
     chrome_options.add_argument('--no-sandbox')
-    download_torrent_tmp_path = base.STATISTICS_PATH + '/' + 'torrent/tmp'
-    prefs = {
-        'download.default_directory': download_torrent_tmp_path,
-        'download.prompt_for_download': False,
-        'download.directory_upgrade': True,
-        'safebrowsing.enabled': True
-    }
-
-    chrome_options.add_experimental_option('prefs', prefs)
-
     driver = webdriver.Chrome(get_driver_path(), chrome_options=chrome_options)
 
     return driver
