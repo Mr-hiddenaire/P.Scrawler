@@ -68,7 +68,6 @@ def torrent_download(torrent_url, driver):
 
     time.sleep(10)
     print('done and to see whether file downloaded or not')
-    exit(9)
     while True:
         time.sleep(1)
 

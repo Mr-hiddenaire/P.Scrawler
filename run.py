@@ -46,7 +46,7 @@ def main():
     n = randint(base.IS_ASIA, base.IS_EURO)
 
     n = 2
-    
+
     func = base.MAP_FUNC[n]
 
     eval(func)()
