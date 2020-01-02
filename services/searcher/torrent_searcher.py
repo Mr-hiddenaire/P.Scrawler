@@ -63,17 +63,14 @@ def torrent_download(torrent_url, driver):
     if os.path.isdir(download_torrent_path) is False:
         raise FileNotFoundError('Download torrent directory does not exists')
 
-    #browser.enable_download_in_headless_chrome(driver, download_torrent_tmp_path)
-
     driver.get(torrent_url)
-    driver.save_screenshot('screenshot.png')
 
     while True:
         time.sleep(1)
 
         if counter > 10:
             driver.save_screenshot('test.png')
-            print(driver.title)
+            driver.save_screenshot('screenshot.png')
             exit(9)
             return None
 
