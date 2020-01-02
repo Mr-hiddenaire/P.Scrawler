@@ -9,7 +9,8 @@ import os
 from utils import tool
 import time
 from random import randint
-import html
+from selenium.common.exceptions import NoSuchElementException
+from services.rarbg import service as rarbg_service
 
 
 def find_torrent(unique_id, driver):
@@ -67,6 +68,61 @@ def torrent_download(torrent_url, driver):
     print(torrent_url)
 
     driver.get(torrent_url)
+
+    try:
+        driver.find_element_by_link_text('Click here').click()
+
+        time.sleep(6)
+
+        driver.save_screenshot('screenshot.png')
+        rarbg_service.make_screenshot_to_captcha_image()
+        captcha_number = rarbg_service.solve_captcha_number_from_image('captcha.png')
+
+        driver.find_element_by_id('solve_string').send_keys(captcha_number)
+
+        try:
+            time.sleep(2)
+            driver.find_element_by_id('button_submit').click()
+
+            logging.info('Break defence step {1} is executing')
+
+            break_success = rarbg_service.parse_break_defence_success(driver.page_source)
+
+            if break_success is True:
+                driver.get(torrent_url)
+            else:
+                print('Downloading break defence fail(1)')
+                pass
+        except NoSuchElementException:
+            print('Can not click the button to submit captcha(1)')
+            pass
+    except NoSuchElementException:
+        try:
+            driver.save_screenshot('screenshot.png')
+            rarbg_service.make_screenshot_to_captcha_image()
+            captcha_number = rarbg_service.solve_captcha_number_from_image('captcha.png')
+
+            driver.find_element_by_id("solve_string").send_keys(captcha_number)
+
+            try:
+                time.sleep(2)
+                driver.find_element_by_id('button_submit').click()
+
+                logging.info('Break defence step {2} is executing')
+
+                break_success = rarbg_service.parse_break_defence_success(driver.page_source)
+
+                if break_success is True:
+                    driver.get(torrent_url)
+                    pass
+                else:
+                    print('Downloading break defence fail(1)')
+                    pass
+            except NoSuchElementException:
+                print('Can not click the button to submit captcha(2)')
+                pass
+        except NoSuchElementException:
+            pass
 
     while True:
         time.sleep(1)
