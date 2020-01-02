@@ -63,68 +63,9 @@ def torrent_download(torrent_url, driver):
     if os.path.isdir(download_torrent_path) is False:
         raise FileNotFoundError('Download torrent directory does not exists')
 
-    browser.enable_download_in_headless_chrome(driver, download_torrent_tmp_path)
+    #browser.enable_download_in_headless_chrome(driver, download_torrent_tmp_path)
 
     driver.get(torrent_url)
-
-    try:
-        driver.find_element_by_link_text('Click here').click()
-
-        time.sleep(6)
-
-        driver.save_screenshot('screenshot.png')
-        rarbg_service.make_screenshot_to_captcha_image()
-        captcha_number = rarbg_service.solve_captcha_number_from_image('captcha.png')
-
-        driver.find_element_by_id('solve_string').send_keys(captcha_number)
-        print('111111')
-        exit(1)
-
-        try:
-            time.sleep(5)
-            driver.find_element_by_id('button_submit').click()
-
-            logging.info('Break defence step {1} is executing')
-
-            break_success = rarbg_service.parse_break_defence_success(driver.page_source)
-
-            if break_success is True:
-                driver.get(torrent_url)
-            else:
-                print('Downloading break defence fail(1)')
-                pass
-        except NoSuchElementException:
-            print('Can not click the button to submit captcha(1)')
-            pass
-    except NoSuchElementException:
-        print('222222')
-        exit(1)
-        try:
-            driver.save_screenshot('screenshot.png')
-            rarbg_service.make_screenshot_to_captcha_image()
-            captcha_number = rarbg_service.solve_captcha_number_from_image('captcha.png')
-
-            driver.find_element_by_id("solve_string").send_keys(captcha_number)
-
-            try:
-                time.sleep(5)
-                driver.find_element_by_id('button_submit').click()
-
-                logging.info('Break defence step {2} is executing')
-
-                break_success = rarbg_service.parse_break_defence_success(driver.page_source)
-
-                if break_success is True:
-                    driver.get(torrent_url)
-                    pass
-                else:
-                    print('Downloading break defence fail(1)')
-                    pass
-            except NoSuchElementException:
-                print('Can not click the button to submit captcha(2)')
-                pass
-        except NoSuchElementException:
-            pass
 
     while True:
         time.sleep(1)
