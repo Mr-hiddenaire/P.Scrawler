@@ -70,7 +70,7 @@ def torrent_download(torrent_url, driver):
 
         if counter > 10:
             driver.save_screenshot('test.png')
-            driver.save_screenshot('screenshot.png')
+            driver.save_screenshot('222_screenshot.png')
             exit(9)
             return None
 
@@ -97,6 +97,66 @@ def torrent_download(torrent_url, driver):
             else:
                 return None
 
+    return None
+
+
+def torrent_download2(torrent_url):
+    driver = rarbg_service.break_defence(base.SCRAWLER_URL_EURO + base.SCRAWLER_URI_EURO % page)
+
+    if driver is False:
+        torrent_download2(torrent_url)
+
+    extension_list = ['.torrent']
+    counter = 1
+
+    download_torrent_tmp_path = base.STATISTICS_PATH + '/' + 'torrent/tmp'
+    download_torrent_path = base.STATISTICS_PATH + '/' + 'torrent'
+
+    if os.path.exists(download_torrent_tmp_path) is not True:
+        os.makedirs(download_torrent_tmp_path)
+
+    if os.path.isdir(download_torrent_tmp_path) is False:
+        raise FileNotFoundError('Download torrent tmp directory does not exists')
+
+    if os.path.isdir(download_torrent_path) is False:
+        raise FileNotFoundError('Download torrent directory does not exists')
+
+    driver.get(torrent_url)
+
+    while True:
+        time.sleep(1)
+
+        if counter > 10:
+            driver.save_screenshot('test.png')
+            driver.save_screenshot('222_screenshot.png')
+            exit(9)
+            return None
+
+        counter = counter + 1
+
+        torrent_filename_list = os.listdir(download_torrent_tmp_path)
+
+        if len(torrent_filename_list) <= 0:
+            continue
+        else:
+            print(torrent_filename_list)
+            print('Done loading')
+            exit()
+
+            original_torrent_filename = torrent_filename_list[0]
+            filename, extension = os.path.splitext(original_torrent_filename)
+
+            if extension in extension_list:
+                destination_torrent_filename = tool.hash_with_blake2b(filename + '_' + str(randint(1, 9999)))  + extension
+
+                os.rename(download_torrent_tmp_path + '/' + original_torrent_filename, download_torrent_path + '/' + destination_torrent_filename)
+
+                return destination_torrent_filename
+            else:
+                return None
+
+    driver.close()
+    
     return None
 
 
