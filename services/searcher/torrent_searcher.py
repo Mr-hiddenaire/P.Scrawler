@@ -46,6 +46,7 @@ def find_torrent(unique_id, driver):
 
 
 def torrent_download(torrent_url, driver):
+    torrent_url = 'https://itorrents.org/torrent/B3FAE252219DCFCE20976B0DAF6BF5F1A5976237.torrent'
     extension_list = ['.torrent']
     counter = 1
 
