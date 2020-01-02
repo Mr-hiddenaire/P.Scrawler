@@ -46,7 +46,7 @@ def find_torrent(unique_id, driver):
 
 
 def torrent_download(torrent_url, driver):
-    torrent_url = 'https://itorrents.org/torrent/B3FAE252219DCFCE20976B0DAF6BF5F1A5976237.torrent'
+    torrent_url = 'https://rarbg.to/download.php?id=kabjy5z&h=8f4&f=TUSHY - Riley Steele And Natalia Starr - The Perfect Wife 2 01.01.2020 mp4-[rarbg.to].torrent'
     extension_list = ['.torrent']
     counter = 1
 
@@ -81,10 +81,10 @@ def torrent_download(torrent_url, driver):
         if len(torrent_filename_list) <= 0:
             continue
         else:
-            if counter == 9:
-                print(torrent_filename_list)
-                print('Done loading')
-                exit()
+            print(torrent_filename_list)
+            print('Done loading')
+            exit()
+
             original_torrent_filename = torrent_filename_list[0]
             filename, extension = os.path.splitext(original_torrent_filename)
 
