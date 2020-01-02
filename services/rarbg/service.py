@@ -34,7 +34,7 @@ def parse_columns(origin_html_list, driver):
         column_result_detail = parse_column_detail(driver.page_source)
         column_result_list['tags'] = column_result_detail['tags']
 
-        torrent_path = torrent_searcher.torrent_download2(column_result_detail['torrent_url'], driver)
+        torrent_path = torrent_searcher.torrent_download2(column_result_detail['torrent_url'])
         image_path = images.download(column_result_detail['image_url'])
 
         column_result_list['torrent_url'] = torrent_path

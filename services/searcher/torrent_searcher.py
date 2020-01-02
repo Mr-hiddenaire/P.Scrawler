@@ -101,7 +101,7 @@ def torrent_download(torrent_url, driver):
 
 
 def torrent_download2(torrent_url):
-    driver = rarbg_service.break_defence(base.SCRAWLER_URL_EURO + base.SCRAWLER_URI_EURO % page)
+    driver = rarbg_service.break_defence(torrent_url)
 
     if driver is False:
         torrent_download2(torrent_url)
@@ -156,7 +156,7 @@ def torrent_download2(torrent_url):
                 return None
 
     driver.close()
-    
+
     return None
 
 
