@@ -66,6 +66,7 @@ def torrent_download(torrent_url, driver):
     #browser.enable_download_in_headless_chrome(driver, download_torrent_tmp_path)
 
     driver.get(torrent_url)
+    driver.save_screenshot('screenshot.png')
 
     while True:
         time.sleep(1)
