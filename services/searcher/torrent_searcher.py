@@ -65,8 +65,6 @@ def torrent_download(torrent_url, driver):
 
     browser.enable_download_in_headless_chrome(driver, download_torrent_tmp_path)
 
-    print(torrent_url)
-
     driver.get(torrent_url)
 
     try:
@@ -79,9 +77,11 @@ def torrent_download(torrent_url, driver):
         captcha_number = rarbg_service.solve_captcha_number_from_image('captcha.png')
 
         driver.find_element_by_id('solve_string').send_keys(captcha_number)
+        print('111111')
+        exit(1)
 
         try:
-            time.sleep(2)
+            time.sleep(5)
             driver.find_element_by_id('button_submit').click()
 
             logging.info('Break defence step {1} is executing')
@@ -97,6 +97,8 @@ def torrent_download(torrent_url, driver):
             print('Can not click the button to submit captcha(1)')
             pass
     except NoSuchElementException:
+        print('222222')
+        exit(1)
         try:
             driver.save_screenshot('screenshot.png')
             rarbg_service.make_screenshot_to_captcha_image()
@@ -105,7 +107,7 @@ def torrent_download(torrent_url, driver):
             driver.find_element_by_id("solve_string").send_keys(captcha_number)
 
             try:
-                time.sleep(2)
+                time.sleep(5)
                 driver.find_element_by_id('button_submit').click()
 
                 logging.info('Break defence step {2} is executing')
