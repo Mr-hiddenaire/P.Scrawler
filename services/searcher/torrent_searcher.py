@@ -119,6 +119,9 @@ def torrent_download_for_rarbg(torrent_url):
 
     driver = rarbg_service.break_defence(torrent_url, True)
 
+    if driver is False:
+        torrent_download_for_rarbg(torrent_url)
+
     driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
 
     params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
@@ -132,8 +135,6 @@ def torrent_download_for_rarbg(torrent_url):
 
         if counter > 5:
             driver.close()
-            print(driver.page_source)
-            exit(9)
             torrent_download_for_rarbg(torrent_url)
 
         counter = counter + 1
@@ -150,9 +151,6 @@ def torrent_download_for_rarbg(torrent_url):
                 destination_torrent_filename = tool.hash_with_blake2b(filename + '_' + str(randint(1, 9999)))  + extension
 
                 os.rename(download_torrent_tmp_path + '/' + original_torrent_filename, download_torrent_path + '/' + destination_torrent_filename)
-
-                print(driver.page_source)
-                exit(9)
                 driver.close()
                 return destination_torrent_filename
             else:
