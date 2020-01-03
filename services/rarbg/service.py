@@ -31,6 +31,8 @@ def do_original_source_scrawler(url):
 
 
 def parse_columns(origin_html_list):
+    db_session = db.init()
+
     doc = PyQuery(origin_html_list)
 
     htmls_list = doc('.lista2').items()
@@ -38,8 +40,13 @@ def parse_columns(origin_html_list):
     for html_list in htmls_list:
         column_result_list = parse_column_list(html_list)
 
+        row = db_session.query(contents_model.Contents).filter(contents_model.Contents.unique_id == column_result_list['file_hash']).first()
+
+        if row is not None:
+            continue
+
         """ defence broken driver initialization """
-        driver = break_defence(column_result_list['detail_url'])
+        driver = break_defence(column_result_list['detail_url'], False)
 
         if driver is False:
             parse_columns(origin_html_list)
@@ -69,17 +76,18 @@ def save_data(data):
     row = db_session.query(contents_model.Contents).filter(contents_model.Contents.unique_id == data['file_hash']).first()
 
     if row is None:
-        new_contents = contents_model.Contents(
-            name=data['title'],
-            unique_id=data['file_hash'],
-            tags=data['tags'],
-            type=2,
-            thumb_url=data['image_url'],
-            torrent_url=data['torrent_url'],
-        )
+        if data['torrent_url'] is not None:
+            new_contents = contents_model.Contents(
+                name=data['title'],
+                unique_id=data['file_hash'],
+                tags=data['tags'],
+                type=2,
+                thumb_url=data['image_url'],
+                torrent_url=data['torrent_url'],
+            )
 
-        db_session.add(new_contents)
-        db_session.commit()
+            db_session.add(new_contents)
+            db_session.commit()
 
 
 def parse_column_detail(html):
@@ -166,7 +174,12 @@ def break_defence(url, is_download_mode=False):
                     driver.close()
                     return False
             elif is_download_mode is True:
-                return driver
+                captcha_error_check = parse_break_defence_captcha_error(driver.page_source)
+                if captcha_error_check is True:
+                    driver.close()
+                    return False
+                else:
+                    return driver
         except NoSuchElementException:
             driver.close()
             return False
@@ -191,7 +204,12 @@ def break_defence(url, is_download_mode=False):
                         driver.close()
                         return False
                 elif is_download_mode is True:
-                    return driver
+                    captcha_error_check = parse_break_defence_captcha_error(driver.page_source)
+                    if captcha_error_check is True:
+                        driver.close()
+                        return False
+                    else:
+                        return driver
             except NoSuchElementException:
                 driver.close()
                 return False
@@ -204,6 +222,16 @@ def break_defence(url, is_download_mode=False):
 
 def parse_break_defence_success(html):
     pattern = re.compile('mcpslar')
+    result = re.findall(pattern, html)
+
+    if len(result) > 0:
+        return True
+    else:
+        return False
+
+
+def parse_break_defence_captcha_error(html):
+    pattern = re.compile('Wrong captcha entered')
     result = re.findall(pattern, html)
 
     if len(result) > 0:

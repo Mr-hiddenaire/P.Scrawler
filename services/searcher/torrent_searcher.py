@@ -123,46 +123,40 @@ def torrent_download_for_rarbg(torrent_url):
     if driver is False:
         torrent_download_for_rarbg(torrent_url)
 
-    driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+        driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
 
-    params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
+        params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
 
-    driver.execute("send_command", params)
+        driver.execute("send_command", params)
 
-    driver.get(torrent_url)
+        driver.get(torrent_url)
 
-    while True:
-        time.sleep(1)
+        while True:
+            time.sleep(1)
 
-        if counter > 5:
-            try:
+            if counter > 5:
                 driver.close()
-            except NoSuchElementException:
-                pass
-            torrent_download_for_rarbg(torrent_url)
-
-        counter = counter + 1
-
-        torrent_filename_list = os.listdir(download_torrent_tmp_path)
-
-        if len(torrent_filename_list) <= 0:
-            continue
-        else:
-            original_torrent_filename = torrent_filename_list[0]
-            filename, extension = os.path.splitext(original_torrent_filename)
-
-            if extension in extension_list:
-                destination_torrent_filename = tool.hash_with_blake2b(filename + '_' + str(randint(1, 9999)))  + extension
-
-                os.rename(download_torrent_tmp_path + '/' + original_torrent_filename, download_torrent_path + '/' + destination_torrent_filename)
-                driver.close()
-                return destination_torrent_filename
-            else:
-                try:
-                    driver.close()
-                except NoSuchElementException:
-                    pass
                 torrent_download_for_rarbg(torrent_url)
+
+            counter = counter + 1
+
+            torrent_filename_list = os.listdir(download_torrent_tmp_path)
+
+            if len(torrent_filename_list) <= 0:
+                continue
+            else:
+                original_torrent_filename = torrent_filename_list[0]
+                filename, extension = os.path.splitext(original_torrent_filename)
+
+                if extension in extension_list:
+                    destination_torrent_filename = tool.hash_with_blake2b(filename + '_' + str(randint(1, 9999)))  + extension
+
+                    os.rename(download_torrent_tmp_path + '/' + original_torrent_filename, download_torrent_path + '/' + destination_torrent_filename)
+                    driver.close()
+                    return destination_torrent_filename
+                else:
+                    driver.close()
+                    torrent_download_for_rarbg(torrent_url)
 
 
 def parse_1337x(url):

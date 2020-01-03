@@ -120,12 +120,19 @@ def do_original_source_scrawler_with_selenium(url):
 
 
 def parse_columns_with_selenium(origin_html_list):
+    db_session = db.init()
+
     doc = PyQuery(origin_html_list)
 
     htmls_list = doc('.video').items()
 
     for list_html in htmls_list:
         column_result_list = parse_column_list(list_html)
+
+        row = db_session.query(contents_model.Contents).filter(contents_model.Contents.unique_id == column_result_list['unique_id']).first()
+
+        if row is not None:
+            continue
 
         """ driver initialization """
         driver = browser.get_driver()
