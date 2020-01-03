@@ -16,11 +16,10 @@ from services.rarbg import images
 
 
 def do_original_source_scrawler(url):
-    """ driver initialization """
+    """ defence broken driver initialization """
     driver = break_defence(url)
 
-    if driver is None:
-        driver.close()
+    if driver is False:
         do_original_source_scrawler(url)
 
     driver.get(url)
@@ -40,6 +39,7 @@ def parse_columns(origin_html_list):
     for html_list in htmls_list:
         column_result_list = parse_column_list(html_list)
 
+        """ defence broken driver initialization """
         driver = break_defence(column_result_list['detail_url'])
 
         driver.get(column_result_list['detail_url'])
