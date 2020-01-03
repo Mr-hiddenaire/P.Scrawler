@@ -121,6 +121,7 @@ def torrent_download_for_rarbg(torrent_url):
         raise FileNotFoundError('Download torrent directory does not exists')
 
     driver = rarbg_service.break_defence(torrent_url)
+    print(driver)
 
     if driver is False:
         torrent_download_for_rarbg(torrent_url)
