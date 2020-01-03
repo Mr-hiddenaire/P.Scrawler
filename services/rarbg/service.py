@@ -42,6 +42,9 @@ def parse_columns(origin_html_list):
         """ defence broken driver initialization """
         driver = break_defence(column_result_list['detail_url'])
 
+        if driver is False:
+            parse_columns(origin_html_list)
+
         driver.get(column_result_list['detail_url'])
 
         detail_html = driver.page_source
