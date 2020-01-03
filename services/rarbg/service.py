@@ -199,6 +199,8 @@ def break_defence(url, is_download_mode=False):
             driver.close()
             return False
 
+    return driver
+
 
 def parse_break_defence_success(html):
     pattern = re.compile('mcpslar')

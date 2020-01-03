@@ -10,6 +10,7 @@ from utils import tool
 import time
 from random import randint
 from services.rarbg import service as rarbg_service
+import logging
 
 
 def find_torrent(unique_id):
@@ -75,7 +76,7 @@ def torrent_download_for_library(torrent_url):
     while True:
         time.sleep(1)
 
-        if counter > 10:
+        if counter > 5:
             driver.close()
             return None
 
@@ -134,6 +135,7 @@ def torrent_download_for_rarbg(torrent_url):
         time.sleep(1)
 
         if counter > 5:
+            logging.info(driver)
             driver.close()
             torrent_download_for_rarbg(torrent_url)
 
