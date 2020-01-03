@@ -18,7 +18,7 @@ from services.rarbg import images
 def do_original_source_scrawler(url):
     """ defence broken driver initialization """
     driver = break_defence(url)
-
+    print(driver)
     if driver is False:
         do_original_source_scrawler(url)
 
