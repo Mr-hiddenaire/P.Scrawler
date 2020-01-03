@@ -120,7 +120,7 @@ def torrent_download_for_rarbg(torrent_url):
 
     driver = rarbg_service.break_defence(torrent_url, True)
 
-    if driver is False:
+    if driver is not False:
         torrent_download_for_rarbg(torrent_url)
 
         driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
