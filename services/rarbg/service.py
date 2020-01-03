@@ -214,6 +214,8 @@ def break_defence_2(url):
 
             logging.info('Break defence step {1} is executing')
 
+            print(driver.page_source)
+            exit()
             break_success = parse_break_defence_success(driver.page_source)
 
             if break_success is True:
