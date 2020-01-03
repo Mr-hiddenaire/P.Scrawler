@@ -9,11 +9,10 @@ import os
 from utils import tool
 import time
 from random import randint
-from selenium.common.exceptions import NoSuchElementException
 from services.rarbg import service as rarbg_service
 
 
-def find_torrent(unique_id, driver):
+def find_torrent(unique_id):
     g_cse_api = searcher.GOOGLE_API_URL % (unique_id, searcher.GOOGLE_CSE_CX, searcher.GOOGLE_CSE_API_KEY)
 
     response = requests.get(g_cse_api, headers={'User-Agent': base.USER_AGENT})
@@ -35,10 +34,10 @@ def find_torrent(unique_id, driver):
 
             func_name = 'parse_' + func_name
 
-            torrent_url = eval(func_name)(g_cse_item['link'], driver)
+            torrent_url = eval(func_name)(g_cse_item['link'])
 
             if torrent_url is not None:
-                torrent_path = torrent_download(torrent_url, driver)
+                torrent_path = torrent_download_for_library(torrent_url)
                 return torrent_path
             else:
                 continue
@@ -46,8 +45,7 @@ def find_torrent(unique_id, driver):
     return None
 
 
-def torrent_download(torrent_url, driver):
-    torrent_url = 'https://rarbg.to/download.php?id=kabjy5z&h=8f4&f=A5976237.torrent'
+def torrent_download_for_library(torrent_url):
     extension_list = ['.torrent']
     counter = 1
 
@@ -63,7 +61,14 @@ def torrent_download(torrent_url, driver):
     if os.path.isdir(download_torrent_path) is False:
         raise FileNotFoundError('Download torrent directory does not exists')
 
-    browser.enable_download_in_headless_chrome(driver, download_torrent_tmp_path)
+    """ driver initialization """
+    driver = browser.get_driver()
+
+    driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+
+    params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
+
+    driver.execute("send_command", params)
 
     driver.get(torrent_url)
 
@@ -71,8 +76,7 @@ def torrent_download(torrent_url, driver):
         time.sleep(1)
 
         if counter > 10:
-            print('damn it(1)')
-            exit(10)
+            driver.close()
             return None
 
         counter = counter + 1
@@ -82,8 +86,6 @@ def torrent_download(torrent_url, driver):
         if len(torrent_filename_list) <= 0:
             continue
         else:
-            print('done')
-            exit(9)
             original_torrent_filename = torrent_filename_list[0]
             filename, extension = os.path.splitext(original_torrent_filename)
 
@@ -92,83 +94,87 @@ def torrent_download(torrent_url, driver):
 
                 os.rename(download_torrent_tmp_path + '/' + original_torrent_filename, download_torrent_path + '/' + destination_torrent_filename)
 
+                driver.close()
                 return destination_torrent_filename
             else:
-                print('damn it(2)')
-                exit(10)
-                return None
-
-    print('damn it(3)')
-    exit(10)
-    return None
-
-
-def torrent_download2(torrent_url):
-    driver = rarbg_service.break_defence(torrent_url)
-
-    if driver is False:
-        torrent_download2(torrent_url)
-
-    extension_list = ['.torrent']
-    counter = 1
-
-    download_torrent_tmp_path = base.STATISTICS_PATH + '/' + 'torrent/tmp'
-    download_torrent_path = base.STATISTICS_PATH + '/' + 'torrent'
-
-    if os.path.exists(download_torrent_tmp_path) is not True:
-        os.makedirs(download_torrent_tmp_path)
-
-    if os.path.isdir(download_torrent_tmp_path) is False:
-        raise FileNotFoundError('Download torrent tmp directory does not exists')
-
-    if os.path.isdir(download_torrent_path) is False:
-        raise FileNotFoundError('Download torrent directory does not exists')
-
-    driver.get(torrent_url)
-
-    while True:
-        time.sleep(1)
-
-        if counter > 10:
-            driver.save_screenshot('test.png')
-            driver.save_screenshot('222_screenshot.png')
-            exit(9)
-            return None
-
-        counter = counter + 1
-
-        torrent_filename_list = os.listdir(download_torrent_tmp_path)
-
-        if len(torrent_filename_list) <= 0:
-            continue
-        else:
-            print(torrent_filename_list)
-            print('Done loading')
-            exit()
-
-            original_torrent_filename = torrent_filename_list[0]
-            filename, extension = os.path.splitext(original_torrent_filename)
-
-            if extension in extension_list:
-                destination_torrent_filename = tool.hash_with_blake2b(filename + '_' + str(randint(1, 9999)))  + extension
-
-                os.rename(download_torrent_tmp_path + '/' + original_torrent_filename, download_torrent_path + '/' + destination_torrent_filename)
-
-                return destination_torrent_filename
-            else:
+                driver.close()
                 return None
 
     driver.close()
-
     return None
 
 
-def parse_1337x(url, driver):
+def torrent_download_for_rarbg(torrent_url):
+    extension_list = ['.torrent']
+    counter = 1
+
+    download_torrent_tmp_path = base.STATISTICS_PATH + '/' + 'torrent/tmp'
+    download_torrent_path = base.STATISTICS_PATH + '/' + 'torrent'
+
+    if os.path.exists(download_torrent_tmp_path) is not True:
+        os.makedirs(download_torrent_tmp_path)
+
+    if os.path.isdir(download_torrent_tmp_path) is False:
+        raise FileNotFoundError('Download torrent tmp directory does not exists')
+
+    if os.path.isdir(download_torrent_path) is False:
+        raise FileNotFoundError('Download torrent directory does not exists')
+
+    driver = rarbg_service.break_defence(torrent_url)
+
+    if driver is False:
+        torrent_download_for_rarbg(torrent_url)
+
+    driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+
+    params = {'cmd': 'Page.setDownloadBehavior',
+              'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
+
+    driver.execute("send_command", params)
+
+    driver.get(torrent_url)
+
+    while True:
+        time.sleep(1)
+
+        if counter > 10:
+            driver.close()
+            return None
+
+        counter = counter + 1
+
+        torrent_filename_list = os.listdir(download_torrent_tmp_path)
+
+        if len(torrent_filename_list) <= 0:
+            continue
+        else:
+            original_torrent_filename = torrent_filename_list[0]
+            filename, extension = os.path.splitext(original_torrent_filename)
+
+            if extension in extension_list:
+                destination_torrent_filename = tool.hash_with_blake2b(filename + '_' + str(randint(1, 9999)))  + extension
+
+                os.rename(download_torrent_tmp_path + '/' + original_torrent_filename, download_torrent_path + '/' + destination_torrent_filename)
+
+                driver.close()
+                return destination_torrent_filename
+            else:
+                driver.close()
+                return None
+
+    driver.close()
+    return None
+
+
+def parse_1337x(url):
     """
     response = requests.get(url, headers={'User-Agent': base.USER_AGENT})
     doc = PyQuery(response.text)
 
     """
+
+    """ driver initialization """
+    driver = browser.get_driver()
 
     driver.get(url)
 
@@ -187,21 +193,27 @@ def parse_1337x(url, driver):
         torrent_is_valid = is_valid_torrent_judged_via_http_status(torrent_url)
 
         if torrent_is_valid is True:
+            driver.close()
             return torrent_url
         else:
             """ Parse out the torrent, but it maybe invalid """
+            driver.close()
             return None
     else:
+        driver.close()
         return None
 
 
-def parse_limetorrents(url, driver):
+def parse_limetorrents(url):
     """
     response = requests.get(url, headers={'User-Agent': base.USER_AGENT})
 
     doc = PyQuery(response.text)
 
     """
+
+    """ driver initialization """
+    driver = browser.get_driver()
 
     driver.get(url)
 
@@ -215,11 +227,14 @@ def parse_limetorrents(url, driver):
         torrent_is_valid = is_valid_torrent_judged_via_http_status(torrent_url)
 
         if torrent_is_valid is True:
+            driver.close()
             return torrent_url
         else:
             """ Parse out the torrent, but it maybe invalid """
+            driver.close()
             return None
     else:
+        driver.close()
         return None
 
 

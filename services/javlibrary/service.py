@@ -6,7 +6,6 @@ from models import contents_model
 from services.searcher import torrent_searcher
 from utils.selenium.chrome import browser
 import time
-from random import randint
 
 
 def parse_columns(origin_html_list):
@@ -104,13 +103,23 @@ def do_original_source_scrawler(url):
     parse_columns(original_html)
 
 
-def do_original_source_scrawler_with_selenium(url, driver):
+def do_original_source_scrawler_with_selenium(url):
+    """ driver initialization """
+    driver = browser.get_driver()
+
     driver.get(url)
 
-    parse_columns_with_selenium(driver.page_source, driver)
+    """ sleep 6 sec to wait cf protection """
+    time.sleep(6)
+
+    htmls = driver.page_source
+
+    driver.close()
+
+    parse_columns_with_selenium(htmls)
 
 
-def parse_columns_with_selenium(origin_html_list, driver):
+def parse_columns_with_selenium(origin_html_list):
     doc = PyQuery(origin_html_list)
 
     htmls_list = doc('.video').items()
@@ -118,25 +127,23 @@ def parse_columns_with_selenium(origin_html_list, driver):
     for list_html in htmls_list:
         column_result_list = parse_column_list(list_html)
 
-        time.sleep(randint(1, 5))
+        """ driver initialization """
+        driver = browser.get_driver()
 
         driver.get(column_result_list['detail_url'])
 
-        column_result_detail = parse_column_detail(driver.page_source)
+        """ sleep 6 sec to wait cf protection """
+        time.sleep(6)
+
+        detail_html = driver.page_source
+        driver.close()
+
+        column_result_detail = parse_column_detail(detail_html)
 
         column_result_list['tags'] = column_result_detail['tags']
 
-        torrent_path = torrent_searcher.find_torrent(column_result_list['unique_id'], driver)
+        torrent_path = torrent_searcher.find_torrent(column_result_list['unique_id'])
 
         column_result_list['torrent_url'] = torrent_path
 
         save_data(column_result_list)
-
-
-def break_defence(url):
-    driver = browser.get_driver()
-    driver.get(url)
-
-    time.sleep(6)
-
-    return driver

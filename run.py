@@ -10,16 +10,12 @@ def do_asia():
 
     page = 1
 
-    driver = javlibrary_service.break_defence(base.SCRAWLER_URL_ASIA + base.SCRAWLER_URI_ASIA % page)
-
     while page <= base.SCRAWLER_MAX_PAGE:
         requested_url = base.SCRAWLER_URL_ASIA + base.SCRAWLER_URI_ASIA % page
 
-        javlibrary_service.do_original_source_scrawler_with_selenium(requested_url, driver)
+        javlibrary_service.do_original_source_scrawler_with_selenium(requested_url)
 
         page = page + 1
-
-    driver.close()
 
 
 def do_euro():
@@ -27,19 +23,12 @@ def do_euro():
 
     page = 1
 
-    driver = rarbg_service.break_defence(base.SCRAWLER_URL_EURO + base.SCRAWLER_URI_EURO % page)
+    while page <= base.SCRAWLER_MAX_PAGE:
+        requested_url = base.SCRAWLER_URL_EURO + base.SCRAWLER_URI_EURO % page
 
-    if driver is False:
-        do_euro()
-    else:
-        while page <= base.SCRAWLER_MAX_PAGE:
-            requested_url = base.SCRAWLER_URL_EURO + base.SCRAWLER_URI_EURO % page
+        rarbg_service.do_original_source_scrawler(requested_url)
 
-            rarbg_service.do_original_source_scrawler(requested_url, driver)
-
-            page = page + 1
-
-        driver.close()
+        page = page + 1
 
 
 def main():

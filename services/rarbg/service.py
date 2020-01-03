@@ -11,30 +11,48 @@ from pyquery import PyQuery
 from models import db
 from utils import tool
 from models import contents_model
-from random import randint
 from services.searcher import torrent_searcher
 from services.rarbg import images
 
 
-def do_original_source_scrawler(url, driver):
+def do_original_source_scrawler(url):
+    """ driver initialization """
+    driver = break_defence(url)
+
+    if driver is None:
+        driver.close()
+        do_original_source_scrawler(url)
+
     driver.get(url)
 
-    parse_columns(driver.page_source, driver)
+    htmls = driver.page_source
+
+    driver.close()
+
+    parse_columns(htmls)
 
 
-def parse_columns(origin_html_list, driver):
+def parse_columns(origin_html_list):
     doc = PyQuery(origin_html_list)
 
     htmls_list = doc('.lista2').items()
 
     for html_list in htmls_list:
         column_result_list = parse_column_list(html_list)
-        time.sleep(randint(1, 5))
+
+        driver = break_defence(column_result_list['detail_url'])
+
         driver.get(column_result_list['detail_url'])
-        column_result_detail = parse_column_detail(driver.page_source)
+
+        detail_html = driver.page_source
+
+        driver.close()
+
+        column_result_detail = parse_column_detail(detail_html)
+
         column_result_list['tags'] = column_result_detail['tags']
 
-        torrent_path = torrent_searcher.torrent_download(column_result_detail['torrent_url'], driver)
+        torrent_path = torrent_searcher.torrent_download_for_rarbg(column_result_detail['torrent_url'])
         image_path = images.download(column_result_detail['image_url'])
 
         column_result_list['torrent_url'] = torrent_path
