@@ -193,6 +193,71 @@ def break_defence(url):
             return False
 
 
+def break_defence_2(url):
+    driver = browser.get_driver()
+    driver.get(url)
+
+    time.sleep(6)
+
+    try:
+        driver.find_element_by_link_text('Click here').click()
+
+        time.sleep(6)
+
+        driver.save_screenshot('screenshot_torrent.png')
+        make_screenshot_to_captcha_image()
+        captcha_number = solve_captcha_number_from_image('captcha_torrent.png')
+
+        driver.find_element_by_id('solve_string').send_keys(captcha_number)
+
+        try:
+            time.sleep(2)
+            driver.find_element_by_id('button_submit').click()
+
+            logging.info('Break defence step {1} is executing')
+
+            break_success = parse_break_defence_success(driver.page_source)
+
+            if break_success is True:
+                return driver
+            else:
+                driver.close()
+                return False
+        except NoSuchElementException:
+            driver.close()
+            return False
+    except NoSuchElementException:
+        try:
+            driver.save_screenshot('screenshot_torrent.png')
+            make_screenshot_to_captcha_image()
+            captcha_number = solve_captcha_number_from_image('captcha_torrent.png')
+
+            driver.find_element_by_id("solve_string").send_keys(captcha_number)
+
+            try:
+                time.sleep(2)
+                driver.find_element_by_id('button_submit').click()
+
+                driver.save_screenshot('screenshot_2.png')
+
+                logging.info('Break defence step {2} is executing')
+
+                break_success = parse_break_defence_success(driver.page_source)
+
+                if break_success is True:
+                    return driver
+                else:
+                    driver.close()
+                    return False
+            except NoSuchElementException:
+                driver.close()
+                return False
+        except NoSuchElementException:
+            logging.info('Break defence step {3} is executing')
+            driver.close()
+            return False
+
+
 def parse_break_defence_success(html):
     pattern = re.compile('mcpslar')
     result = re.findall(pattern, html)
