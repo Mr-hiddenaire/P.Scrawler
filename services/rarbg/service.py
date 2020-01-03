@@ -6,7 +6,6 @@ from PIL import Image
 import pytesseract
 from utils.selenium.chrome import browser
 from selenium.common.exceptions import NoSuchElementException
-import logging
 from pyquery import PyQuery
 from models import db
 from utils import tool
@@ -17,8 +16,8 @@ from services.rarbg import images
 
 def do_original_source_scrawler(url):
     """ defence broken driver initialization """
-    driver = break_defence(url)
-    print(driver)
+    driver = break_defence(url, False)
+
     if driver is False:
         do_original_source_scrawler(url)
 
@@ -128,7 +127,16 @@ def parse_column_list(html):
     return result
 
 
-def break_defence(url):
+def break_defence(url, is_download_mode=False):
+
+    if is_download_mode is False:
+        screenshot_filename = 'screenshot.png'
+        captcha_filename = 'captcha.png'
+    elif is_download_mode is True:
+        screenshot_filename = 'screenshot_2.png'
+        captcha_filename = 'captcha_2.png'
+
+
     driver = browser.get_driver()
     driver.get(url)
 
@@ -139,36 +147,17 @@ def break_defence(url):
 
         time.sleep(6)
 
-        driver.save_screenshot('screenshot.png')
-        make_screenshot_to_captcha_image('screenshot.png', 'captcha.png')
-        captcha_number = solve_captcha_number_from_image('captcha.png')
+        driver.save_screenshot(screenshot_filename)
+        make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
+        captcha_number = solve_captcha_number_from_image(captcha_filename)
 
         driver.find_element_by_id('solve_string').send_keys(captcha_number)
 
         try:
             time.sleep(2)
             driver.find_element_by_id('button_submit').click()
-            break_success = parse_break_defence_success(driver.page_source)
 
-            if break_success is True:
-                return driver
-            else:
-                driver.close()
-                return False
-        except NoSuchElementException:
-            driver.close()
-            return False
-    except NoSuchElementException:
-        try:
-            driver.save_screenshot('screenshot.png')
-            make_screenshot_to_captcha_image('screenshot.png', 'captcha.png')
-            captcha_number = solve_captcha_number_from_image('captcha.png')
-
-            driver.find_element_by_id('solve_string').send_keys(captcha_number)
-
-            try:
-                time.sleep(2)
-                driver.find_element_by_id('button_submit').click()
+            if is_download_mode is False:
                 break_success = parse_break_defence_success(driver.page_source)
 
                 if break_success is True:
@@ -176,43 +165,16 @@ def break_defence(url):
                 else:
                     driver.close()
                     return False
-            except NoSuchElementException:
-                driver.close()
-                return False
-        except NoSuchElementException:
-            driver.close()
-            return False
-
-
-def break_defence_for_download(url):
-    driver = browser.get_driver()
-    driver.get(url)
-
-    time.sleep(6)
-
-    try:
-        driver.find_element_by_link_text('Click here').click()
-
-        time.sleep(6)
-
-        driver.save_screenshot('screenshot_2.png')
-        make_screenshot_to_captcha_image('screenshot_2.png', 'captcha_2.png')
-        captcha_number = solve_captcha_number_from_image('captcha_2.png')
-
-        driver.find_element_by_id('solve_string').send_keys(captcha_number)
-
-        try:
-            time.sleep(2)
-            driver.find_element_by_id('button_submit').click()
-            return driver
+            elif is_download_mode is True:
+                return driver
         except NoSuchElementException:
             driver.close()
             return False
     except NoSuchElementException:
         try:
-            driver.save_screenshot('screenshot_2.png')
-            make_screenshot_to_captcha_image('screenshot_2.png', 'captcha_2.png')
-            captcha_number = solve_captcha_number_from_image('captcha_2.png')
+            driver.save_screenshot(screenshot_filename)
+            make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
+            captcha_number = solve_captcha_number_from_image(captcha_filename)
 
             driver.find_element_by_id('solve_string').send_keys(captcha_number)
 
@@ -220,7 +182,16 @@ def break_defence_for_download(url):
                 time.sleep(2)
                 driver.find_element_by_id('button_submit').click()
 
-                return driver
+                if is_download_mode is False:
+                    break_success = parse_break_defence_success(driver.page_source)
+
+                    if break_success is True:
+                        return driver
+                    else:
+                        driver.close()
+                        return False
+                elif is_download_mode is True:
+                    return driver
             except NoSuchElementException:
                 driver.close()
                 return False

@@ -117,7 +117,7 @@ def torrent_download_for_rarbg(torrent_url):
     if os.path.isdir(download_torrent_path) is False:
         raise FileNotFoundError('Download torrent directory does not exists')
 
-    driver = rarbg_service.break_defence_for_download(torrent_url)
+    driver = rarbg_service.break_defence(torrent_url, True)
 
     driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
 
@@ -127,10 +127,12 @@ def torrent_download_for_rarbg(torrent_url):
 
     driver.get(torrent_url)
 
+    print(driver.page_source)
+    exit(9)
     while True:
         time.sleep(1)
 
-        if counter > 10:
+        if counter > 5:
             driver.close()
             torrent_download_for_rarbg(torrent_url)
 
