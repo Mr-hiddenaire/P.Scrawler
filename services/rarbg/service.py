@@ -204,7 +204,7 @@ def break_defence_2(url):
 
         driver.save_screenshot('screenshot_torrent_1.png')
         make_screenshot_to_captcha_image()
-        captcha_number = solve_captcha_number_from_image('captcha_torrent_1.png')
+        captcha_number = solve_captcha_number_from_image('captcha.png')
 
         driver.find_element_by_id('solve_string').send_keys(captcha_number)
 
@@ -226,9 +226,9 @@ def break_defence_2(url):
             return '22222222222'
     except NoSuchElementException:
         try:
-            driver.save_screenshot('screenshot_torrent_1.png')
+            driver.save_screenshot('screenshot_torrent_2.png')
             make_screenshot_to_captcha_image()
-            captcha_number = solve_captcha_number_from_image('captcha_torrent_1.png')
+            captcha_number = solve_captcha_number_from_image('captcha.png')
 
             driver.find_element_by_id("solve_string").send_keys(captcha_number)
 
