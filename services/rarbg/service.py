@@ -148,9 +148,6 @@ def break_defence(url):
         try:
             time.sleep(2)
             driver.find_element_by_id('button_submit').click()
-
-            logging.info('Break defence step {1} is executing')
-
             break_success = parse_break_defence_success(driver.page_source)
 
             if break_success is True:
@@ -167,14 +164,11 @@ def break_defence(url):
             make_screenshot_to_captcha_image('screenshot.png', 'captcha.png')
             captcha_number = solve_captcha_number_from_image('captcha.png')
 
-            driver.find_element_by_id("solve_string").send_keys(captcha_number)
+            driver.find_element_by_id('solve_string').send_keys(captcha_number)
 
             try:
                 time.sleep(2)
                 driver.find_element_by_id('button_submit').click()
-
-                logging.info('Break defence step {2} is executing')
-
                 break_success = parse_break_defence_success(driver.page_source)
 
                 if break_success is True:
@@ -186,12 +180,11 @@ def break_defence(url):
                 driver.close()
                 return False
         except NoSuchElementException:
-            logging.info('Break defence step {3} is executing')
             driver.close()
             return False
 
 
-def break_defence_2(url):
+def break_defence_for_download(url):
     driver = browser.get_driver()
     driver.get(url)
 
@@ -211,49 +204,29 @@ def break_defence_2(url):
         try:
             time.sleep(2)
             driver.find_element_by_id('button_submit').click()
-
-            logging.info('Break defence step {1} is executing')
-
-            print(driver.page_source)
-            exit()
-            break_success = parse_break_defence_success(driver.page_source)
-
-            if break_success is True:
-                return driver
-            else:
-                driver.close()
-                return '11111111'
+            return driver
         except NoSuchElementException:
             driver.close()
-            return '22222222222'
+            return False
     except NoSuchElementException:
         try:
             driver.save_screenshot('screenshot_2.png')
             make_screenshot_to_captcha_image('screenshot_2.png', 'captcha_2.png')
             captcha_number = solve_captcha_number_from_image('captcha_2.png')
 
-            driver.find_element_by_id("solve_string").send_keys(captcha_number)
+            driver.find_element_by_id('solve_string').send_keys(captcha_number)
 
             try:
                 time.sleep(2)
                 driver.find_element_by_id('button_submit').click()
 
-                logging.info('Break defence step {2} is executing')
-
-                break_success = parse_break_defence_success(driver.page_source)
-
-                if break_success is True:
-                    return driver
-                else:
-                    driver.close()
-                    return '333333333'
+                return driver
             except NoSuchElementException:
                 driver.close()
-                return '44444444444'
+                return False
         except NoSuchElementException:
-            logging.info('Break defence step {3} is executing')
             driver.close()
-            return '555555555'
+            return False
 
 
 def parse_break_defence_success(html):

@@ -120,17 +120,11 @@ def torrent_download_for_rarbg(torrent_url):
     if os.path.isdir(download_torrent_path) is False:
         raise FileNotFoundError('Download torrent directory does not exists')
 
-    driver = rarbg_service.break_defence_2(torrent_url)
-
-    print(driver)
-    exit()
-    if driver is False:
-        torrent_download_for_rarbg(torrent_url)
+    driver = rarbg_service.break_defence_for_download(torrent_url)
 
     driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
 
-    params = {'cmd': 'Page.setDownloadBehavior',
-              'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
+    params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
 
     driver.execute("send_command", params)
 
