@@ -71,7 +71,7 @@ def torrent_download_for_library(torrent_url):
     driver.execute("send_command", params)
 
     driver.get(torrent_url)
-
+    driver.save_screenshot('screenshot_2.png')
     while True:
         time.sleep(1)
 
