@@ -140,7 +140,7 @@ def break_defence(url):
         time.sleep(6)
 
         driver.save_screenshot('screenshot.png')
-        make_screenshot_to_captcha_image()
+        make_screenshot_to_captcha_image('screenshot.png', 'captcha.png')
         captcha_number = solve_captcha_number_from_image('captcha.png')
 
         driver.find_element_by_id('solve_string').send_keys(captcha_number)
@@ -164,7 +164,7 @@ def break_defence(url):
     except NoSuchElementException:
         try:
             driver.save_screenshot('screenshot.png')
-            make_screenshot_to_captcha_image()
+            make_screenshot_to_captcha_image('screenshot.png', 'captcha.png')
             captcha_number = solve_captcha_number_from_image('captcha.png')
 
             driver.find_element_by_id("solve_string").send_keys(captcha_number)
@@ -202,9 +202,9 @@ def break_defence_2(url):
 
         time.sleep(6)
 
-        driver.save_screenshot('screenshot_torrent_1.png')
-        make_screenshot_to_captcha_image()
-        captcha_number = solve_captcha_number_from_image('captcha.png')
+        driver.save_screenshot('screenshot_2.png')
+        make_screenshot_to_captcha_image('screenshot_2.png', 'captcha_2.png')
+        captcha_number = solve_captcha_number_from_image('captcha_2.png')
 
         driver.find_element_by_id('solve_string').send_keys(captcha_number)
 
@@ -226,9 +226,9 @@ def break_defence_2(url):
             return '22222222222'
     except NoSuchElementException:
         try:
-            driver.save_screenshot('screenshot_torrent_2.png')
-            make_screenshot_to_captcha_image()
-            captcha_number = solve_captcha_number_from_image('captcha.png')
+            driver.save_screenshot('screenshot_2.png')
+            make_screenshot_to_captcha_image('screenshot_2.png', 'captcha_2.png')
+            captcha_number = solve_captcha_number_from_image('captcha_2.png')
 
             driver.find_element_by_id("solve_string").send_keys(captcha_number)
 
@@ -264,11 +264,11 @@ def parse_break_defence_success(html):
         return False
 
 
-def make_screenshot_to_captcha_image():
-    im = Image.open('screenshot.png')
+def make_screenshot_to_captcha_image(screenshot_filename, captcha_filename):
+    im = Image.open(screenshot_filename)
 
     im2 = im.crop((coordinate.X, coordinate.Y, coordinate.X + coordinate.W, coordinate.Y + coordinate.H))
-    im2.save('captcha.png')
+    im2.save(captcha_filename)
 
 
 def form_submit_url_build(last_response):
@@ -351,7 +351,7 @@ def parse_captcha_form_ref_captcha_submitted_bot_captcha(html):
     return '1'
 
 
-def solve_captcha_number_from_image(filename='captcha.png'):
+def solve_captcha_number_from_image(filename):
     img = Image.open(filename)
     number = pytesseract.image_to_string(img)
 
