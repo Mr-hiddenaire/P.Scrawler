@@ -71,6 +71,8 @@ def torrent_download(torrent_url, driver):
         time.sleep(1)
 
         if counter > 10:
+            print('damn it(1)')
+            exit(10)
             return None
 
         counter = counter + 1
@@ -92,9 +94,11 @@ def torrent_download(torrent_url, driver):
 
                 return destination_torrent_filename
             else:
+                print('damn it(2)')
+                exit(10)
                 return None
 
-    print('damn it')
+    print('damn it(3)')
     exit(10)
     return None
 
