@@ -100,9 +100,6 @@ def torrent_download_for_library(torrent_url):
                 driver.close()
                 return None
 
-    driver.close()
-    return None
-
 
 def torrent_download_for_rarbg(torrent_url):
     extension_list = ['.torrent']
@@ -135,7 +132,7 @@ def torrent_download_for_rarbg(torrent_url):
 
         if counter > 10:
             driver.close()
-            return None
+            torrent_download_for_rarbg(torrent_url)
 
         counter = counter + 1
 
@@ -156,10 +153,7 @@ def torrent_download_for_rarbg(torrent_url):
                 return destination_torrent_filename
             else:
                 driver.close()
-                return None
-
-    driver.close()
-    return None
+                torrent_download_for_rarbg(torrent_url)
 
 
 def parse_1337x(url):
