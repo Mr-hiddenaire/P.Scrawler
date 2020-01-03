@@ -2,7 +2,7 @@ import requests
 from config import searcher
 from pyquery import PyQuery
 import json
-import logging
+from selenium.common.exceptions import NoSuchElementException
 from config import base
 from utils.selenium.chrome import browser
 import os
@@ -135,8 +135,10 @@ def torrent_download_for_rarbg(torrent_url):
         time.sleep(1)
 
         if counter > 5:
-            logging.info(driver)
-            driver.close()
+            try:
+                driver.close()
+            except NoSuchElementException:
+                pass
             torrent_download_for_rarbg(torrent_url)
 
         counter = counter + 1
@@ -156,7 +158,10 @@ def torrent_download_for_rarbg(torrent_url):
                 driver.close()
                 return destination_torrent_filename
             else:
-                driver.close()
+                try:
+                    driver.close()
+                except NoSuchElementException:
+                    pass
                 torrent_download_for_rarbg(torrent_url)
 
 
