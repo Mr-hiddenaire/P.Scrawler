@@ -173,8 +173,8 @@ def break_defence(url):
                 time.sleep(2)
                 driver.find_element_by_id('button_submit').click()
 
-                driver.save_screenshot('screenshot.png')
-                
+                driver.save_screenshot('screenshot_2.png')
+
                 logging.info('Break defence step {2} is executing')
 
                 break_success = parse_break_defence_success(driver.page_source)
