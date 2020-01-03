@@ -122,8 +122,10 @@ def torrent_download_for_rarbg(torrent_url):
 
     driver = rarbg_service.break_defence_2(torrent_url)
 
-    #if driver is False:
-        #torrent_download_for_rarbg(torrent_url)
+    print(driver)
+    exit()
+    if driver is False:
+        torrent_download_for_rarbg(torrent_url)
 
     driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
 
@@ -133,7 +135,6 @@ def torrent_download_for_rarbg(torrent_url):
     driver.execute("send_command", params)
 
     driver.get(torrent_url)
-    driver.save_screenshot('screenshot_2.png')
 
     while True:
         time.sleep(1)

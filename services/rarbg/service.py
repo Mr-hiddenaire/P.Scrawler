@@ -204,9 +204,9 @@ def break_defence_2(url):
 
         time.sleep(6)
 
-        driver.save_screenshot('screenshot_torrent.png')
+        driver.save_screenshot('screenshot_torrent_1.png')
         make_screenshot_to_captcha_image()
-        captcha_number = solve_captcha_number_from_image('captcha_torrent.png')
+        captcha_number = solve_captcha_number_from_image('captcha_torrent_1.png')
 
         driver.find_element_by_id('solve_string').send_keys(captcha_number)
 
@@ -222,23 +222,21 @@ def break_defence_2(url):
                 return driver
             else:
                 driver.close()
-                return False
+                return '11111111'
         except NoSuchElementException:
             driver.close()
-            return False
+            return '22222222222'
     except NoSuchElementException:
         try:
-            driver.save_screenshot('screenshot_torrent.png')
+            driver.save_screenshot('screenshot_torrent_2.png')
             make_screenshot_to_captcha_image()
-            captcha_number = solve_captcha_number_from_image('captcha_torrent.png')
+            captcha_number = solve_captcha_number_from_image('captcha_torrent_2.png')
 
             driver.find_element_by_id("solve_string").send_keys(captcha_number)
 
             try:
                 time.sleep(2)
                 driver.find_element_by_id('button_submit').click()
-
-                driver.save_screenshot('screenshot_2.png')
 
                 logging.info('Break defence step {2} is executing')
 
@@ -248,14 +246,14 @@ def break_defence_2(url):
                     return driver
                 else:
                     driver.close()
-                    return False
+                    return '333333333'
             except NoSuchElementException:
                 driver.close()
-                return False
+                return '44444444444'
         except NoSuchElementException:
             logging.info('Break defence step {3} is executing')
             driver.close()
-            return False
+            return '555555555'
 
 
 def parse_break_defence_success(html):
