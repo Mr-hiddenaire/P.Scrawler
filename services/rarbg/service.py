@@ -65,9 +65,7 @@ def parse_columns(origin_html_list):
         column_result_list['torrent_url'] = torrent_path
         column_result_list['image_url'] = image_path
 
-        print(column_result_list)
-        exit(67)
-
+        """ torrent download fail ,keep next item """
         if column_result_list['torrent_url'] is None:
             continue
 

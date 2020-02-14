@@ -160,7 +160,7 @@ def torrent_download_for_rarbg(torrent_url, driver):
             driver.execute("send_command", params)
             driver.get(torrent_url)
 
-    """ download time exceed """
+    """ wait to download finished """
     time.sleep(5)
 
     while True:
