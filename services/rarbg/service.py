@@ -16,18 +16,16 @@ from services.rarbg import images
 
 def do_original_source_scrawler(url):
     """ defence broken driver initialization """
-    driver = break_defence(url, False)
+    driver = break_defence(url)
 
-    if driver is False:
-        do_original_source_scrawler(url)
+    if driver is not None:
+        driver.get(url)
 
-    driver.get(url)
+        htmls = driver.page_source
 
-    htmls = driver.page_source
+        driver.close()
 
-    driver.close()
-
-    parse_columns(htmls)
+        parse_columns(htmls)
 
 
 def parse_columns(origin_html_list):
@@ -37,6 +35,13 @@ def parse_columns(origin_html_list):
 
     htmls_list = doc('.lista2').items()
 
+    """ defence broken driver initialization """
+    requested_url = base.SCRAWLER_URL_EURO + '/' + base.SCRAWLER_URI_EURO
+    driver = break_defence(requested_url)
+
+    if driver is None:
+        return None
+
     for html_list in htmls_list:
         column_result_list = parse_column_list(html_list)
 
@@ -45,49 +50,43 @@ def parse_columns(origin_html_list):
         if row is not None:
             continue
 
-        """ defence broken driver initialization """
-        driver = break_defence(column_result_list['detail_url'], False)
-
-        if driver is False:
-            parse_columns(origin_html_list)
-
         driver.get(column_result_list['detail_url'])
 
         detail_html = driver.page_source
-
-        driver.close()
 
         column_result_detail = parse_column_detail(detail_html)
 
         column_result_list['tags'] = column_result_detail['tags']
 
-        torrent_path = torrent_searcher.torrent_download_for_rarbg(column_result_detail['torrent_url'])
+        torrent_path = torrent_searcher.torrent_download_for_rarbg(column_result_detail['torrent_url'], driver)
         image_path = images.download(column_result_detail['image_url'])
 
         column_result_list['torrent_url'] = torrent_path
         column_result_list['image_url'] = image_path
 
+        print(column_result_list)
+        exit(67)
+
         save_data(column_result_list)
+
+    driver.close()
 
 
 def save_data(data):
     db_session = db.init()
 
-    row = db_session.query(contents_model.Contents).filter(contents_model.Contents.unique_id == data['file_hash']).first()
+    if data['torrent_url'] is not None:
+        new_contents = contents_model.Contents(
+            name=data['title'],
+            unique_id=data['file_hash'],
+            tags=data['tags'],
+            type=2,
+            thumb_url=data['image_url'],
+            torrent_url=data['torrent_url'],
+        )
 
-    if row is None:
-        if data['torrent_url'] is not None:
-            new_contents = contents_model.Contents(
-                name=data['title'],
-                unique_id=data['file_hash'],
-                tags=data['tags'],
-                type=2,
-                thumb_url=data['image_url'],
-                torrent_url=data['torrent_url'],
-            )
-
-            db_session.add(new_contents)
-            db_session.commit()
+        db_session.add(new_contents)
+        db_session.commit()
 
 
 def parse_column_detail(html):
@@ -135,89 +134,55 @@ def parse_column_list(html):
     return result
 
 
-def break_defence(url, is_download_mode=False):
-
-    if is_download_mode is False:
-        screenshot_filename = 'screenshot.png'
-        captcha_filename = 'captcha.png'
-    elif is_download_mode is True:
-        screenshot_filename = 'screenshot_2.png'
-        captcha_filename = 'captcha_2.png'
-
+def break_defence(url):
+    screenshot_filename = 'screenshot.png'
+    captcha_filename = 'captcha.png'
 
     driver = browser.get_driver()
     driver.get(url)
 
-    time.sleep(6)
-
     try:
-        driver.find_element_by_link_text('Click here').click()
+        time.sleep(6)
 
+        driver.find_element_by_link_text('Click here').click()
+        driver.save_screenshot(screenshot_filename)
+        make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
+        captcha_number = solve_captcha_number_from_image(captcha_filename)
+
+        if captcha_number is False:
+            return None
+
+        driver.find_element_by_id('solve_string').send_keys(captcha_number)
+
+        driver.find_element_by_id('button_submit').click()
+        break_success = parse_break_defence_success(driver.page_source)
+
+        if break_success is True:
+            return driver
+        else:
+            driver.close()
+            return None
+    except NoSuchElementException:
         time.sleep(6)
 
         driver.save_screenshot(screenshot_filename)
         make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
         captcha_number = solve_captcha_number_from_image(captcha_filename)
 
+        if captcha_number is False:
+            return None
+
         driver.find_element_by_id('solve_string').send_keys(captcha_number)
+        driver.find_element_by_id('button_submit').click()
 
-        try:
-            time.sleep(2)
-            driver.find_element_by_id('button_submit').click()
-
-            if is_download_mode is False:
-                break_success = parse_break_defence_success(driver.page_source)
-
-                if break_success is True:
-                    return driver
-                else:
-                    driver.close()
-                    return False
-            elif is_download_mode is True:
-                captcha_error_check = parse_break_defence_captcha_error(driver.page_source)
-                if captcha_error_check is True:
-                    driver.close()
-                    return False
-                else:
-                    return driver
-        except NoSuchElementException:
+        break_success = parse_break_defence_success(driver.page_source)
+        if break_success is True:
+            return driver
+        else:
             driver.close()
-            return False
-    except NoSuchElementException:
-        try:
-            driver.save_screenshot(screenshot_filename)
-            make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
-            captcha_number = solve_captcha_number_from_image(captcha_filename)
+            return None
 
-            driver.find_element_by_id('solve_string').send_keys(captcha_number)
-
-            try:
-                time.sleep(2)
-                driver.find_element_by_id('button_submit').click()
-
-                if is_download_mode is False:
-                    break_success = parse_break_defence_success(driver.page_source)
-
-                    if break_success is True:
-                        return driver
-                    else:
-                        driver.close()
-                        return False
-                elif is_download_mode is True:
-                    captcha_error_check = parse_break_defence_captcha_error(driver.page_source)
-                    if captcha_error_check is True:
-                        driver.close()
-                        return False
-                    else:
-                        return driver
-            except NoSuchElementException:
-                driver.close()
-                return False
-        except NoSuchElementException:
-            driver.close()
-            return False
-
-    return driver
+    return None
 
 
 def parse_break_defence_success(html):
@@ -330,6 +295,9 @@ def parse_captcha_form_ref_captcha_submitted_bot_captcha(html):
 def solve_captcha_number_from_image(filename):
     img = Image.open(filename)
     number = pytesseract.image_to_string(img)
+
+    if len(number) < 5:
+        return False
 
     return number
 

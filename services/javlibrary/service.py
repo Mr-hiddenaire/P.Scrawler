@@ -32,21 +32,18 @@ def parse_columns(origin_html_list):
 def save_data(data):
     db_session = db.init()
 
-    row = db_session.query(contents_model.Contents).filter(contents_model.Contents.unique_id == data['unique_id']).first()
+    if data['torrent_url'] is not None:
+        new_contents = contents_model.Contents(
+            name=data['name'],
+            unique_id=data['unique_id'],
+            tags=data['tags'],
+            type=1,
+            thumb_url=data['image_url'],
+            torrent_url=data['torrent_url'],
+        )
 
-    if row is None:
-        if data['torrent_url'] is not None:
-            new_contents = contents_model.Contents(
-                name=data['name'],
-                unique_id=data['unique_id'],
-                tags=data['tags'],
-                type=1,
-                thumb_url=data['image_url'],
-                torrent_url=data['torrent_url'],
-            )
-
-            db_session.add(new_contents)
-            db_session.commit()
+        db_session.add(new_contents)
+        db_session.commit()
 
 
 def parse_column_list(html):
