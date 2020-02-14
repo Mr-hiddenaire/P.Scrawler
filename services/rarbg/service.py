@@ -40,7 +40,7 @@ def parse_columns(origin_html_list):
     driver = break_defence(requested_url)
 
     if driver is None:
-        print('the driver of driver initialization is failure')
+        print('the initialization of driver is failure')
         exit(1)
 
     for html_list in htmls_list:
@@ -173,9 +173,6 @@ def break_defence(url):
         make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
         captcha_number = solve_captcha_number_from_image(captcha_filename)
 
-        if captcha_number is False:
-            return None
-
         driver.find_element_by_id('solve_string').send_keys(captcha_number)
         driver.find_element_by_id('button_submit').click()
 
@@ -299,9 +296,6 @@ def parse_captcha_form_ref_captcha_submitted_bot_captcha(html):
 def solve_captcha_number_from_image(filename):
     img = Image.open(filename)
     number = pytesseract.image_to_string(img)
-
-    if len(number) < 5:
-        return False
 
     return number
 
