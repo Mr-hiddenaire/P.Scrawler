@@ -40,7 +40,8 @@ def parse_columns(origin_html_list):
     driver = break_defence(requested_url)
 
     if driver is None:
-        return None
+        print('the driver of driver initialization is failure')
+        exit(1)
 
     for html_list in htmls_list:
         column_result_list = parse_column_list(html_list)

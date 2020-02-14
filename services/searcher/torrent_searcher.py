@@ -124,6 +124,7 @@ def torrent_download_for_rarbg(torrent_url, driver):
     time.sleep(6)
 
     try:
+        driver.get(torrent_url)
         driver.find_element_by_link_text('Click here').click()
         driver.save_screenshot(screenshot_filename)
         rarbg_service.make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
@@ -142,28 +143,30 @@ def torrent_download_for_rarbg(torrent_url, driver):
         driver.get(torrent_url)
     except NoSuchElementException:
         try:
+            driver.get(torrent_url)
             driver.save_screenshot(screenshot_filename)
             rarbg_service.make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
             captcha_number = rarbg_service.solve_captcha_number_from_image(captcha_filename)
+
+            driver.find_element_by_id('solve_string').send_keys(captcha_number)
 
             if captcha_number is False:
                 driver.close()
                 return None
 
-            driver.find_element_by_id('solve_string').send_keys(captcha_number)
             driver.find_element_by_id('button_submit').click()
 
             driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
             params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
             driver.execute("send_command", params)
             driver.get(torrent_url)
-
         except NoSuchElementException:
             driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
             params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
             driver.execute("send_command", params)
             driver.get(torrent_url)
 
+    """ download time exceed """
     time.sleep(5)
 
     while True:
