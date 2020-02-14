@@ -67,6 +67,9 @@ def parse_columns(origin_html_list):
         print(column_result_list)
         exit(67)
 
+        if column_result_list['torrent_url'] is None:
+            continue
+
         save_data(column_result_list)
 
     driver.close()

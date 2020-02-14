@@ -106,6 +106,9 @@ def torrent_download_for_rarbg(torrent_url, driver):
     extension_list = ['.torrent']
     counter = 1
 
+    screenshot_filename = 'screenshot.png'
+    captcha_filename = 'captcha.png'
+
     download_torrent_tmp_path = base.STATISTICS_PATH + '/' + 'torrent/tmp'
     download_torrent_path = base.STATISTICS_PATH + '/' + 'torrent'
 
@@ -118,19 +121,53 @@ def torrent_download_for_rarbg(torrent_url, driver):
     if os.path.isdir(download_torrent_path) is False:
         raise FileNotFoundError('Download torrent directory does not exists')
 
-    driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+    time.sleep(6)
 
-    params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
+    try:
+        driver.find_element_by_link_text('Click here').click()
+        driver.save_screenshot(screenshot_filename)
+        rarbg_service.make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
+        captcha_number = rarbg_service.solve_captcha_number_from_image(captcha_filename)
 
-    driver.execute("send_command", params)
+        if captcha_number is False:
+            driver.close()
+            return None
 
-    driver.get(torrent_url)
+        driver.find_element_by_id('solve_string').send_keys(captcha_number)
+        driver.find_element_by_id('button_submit').click()
+
+        driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+        params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
+        driver.execute("send_command", params)
+        driver.get(torrent_url)
+    except NoSuchElementException:
+        try:
+            driver.save_screenshot(screenshot_filename)
+            rarbg_service.make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
+            captcha_number = rarbg_service.solve_captcha_number_from_image(captcha_filename)
+
+            if captcha_number is False:
+                driver.close()
+                return None
+
+            driver.find_element_by_id('solve_string').send_keys(captcha_number)
+            driver.find_element_by_id('button_submit').click()
+
+            driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+            params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
+            driver.execute("send_command", params)
+            driver.get(torrent_url)
+
+        except NoSuchElementException:
+            driver.command_executor._commands["send_command"] = ("POST", '/session/$sessionId/chromium/send_command')
+            params = {'cmd': 'Page.setDownloadBehavior', 'params': {'behavior': 'allow', 'downloadPath': download_torrent_tmp_path}}
+            driver.execute("send_command", params)
+            driver.get(torrent_url)
 
     while True:
         time.sleep(1)
 
         if counter > 5:
-            driver.save_screenshot('test.png')
             driver.close()
             return None
 
@@ -148,8 +185,7 @@ def torrent_download_for_rarbg(torrent_url, driver):
                 destination_torrent_filename = tool.hash_with_blake2b(
                     filename + '_' + str(randint(1, 9999))) + extension
 
-                os.rename(download_torrent_tmp_path + '/' + original_torrent_filename,
-                          download_torrent_path + '/' + destination_torrent_filename)
+                os.rename(download_torrent_tmp_path + '/' + original_torrent_filename, download_torrent_path + '/' + destination_torrent_filename)
                 driver.close()
                 return destination_torrent_filename
             else:
