@@ -123,10 +123,9 @@ def torrent_download_for_rarbg(torrent_url, driver):
 
     try:
         driver.get(torrent_url)
-        driver.find_element_by_link_text('Click here').click()
-
         time.sleep(6)
 
+        driver.find_element_by_link_text('Click here').click()
         driver.save_screenshot(screenshot_filename)
         rarbg_service.make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
         captcha_number = rarbg_service.solve_captcha_number_from_image(captcha_filename)
@@ -141,6 +140,8 @@ def torrent_download_for_rarbg(torrent_url, driver):
     except NoSuchElementException:
         try:
             driver.get(torrent_url)
+            time.sleep(6)
+
             driver.save_screenshot(screenshot_filename)
             rarbg_service.make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
             captcha_number = rarbg_service.solve_captcha_number_from_image(captcha_filename)

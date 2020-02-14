@@ -153,9 +153,6 @@ def break_defence(url):
         make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
         captcha_number = solve_captcha_number_from_image(captcha_filename)
 
-        if captcha_number is False:
-            return None
-
         driver.find_element_by_id('solve_string').send_keys(captcha_number)
 
         driver.find_element_by_id('button_submit').click()
