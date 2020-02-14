@@ -167,7 +167,6 @@ def torrent_download_for_rarbg(torrent_url, driver):
         time.sleep(1)
 
         if counter > 5:
-            driver.close()
             return None
 
         counter = counter + 1
@@ -185,10 +184,8 @@ def torrent_download_for_rarbg(torrent_url, driver):
                     filename + '_' + str(randint(1, 9999))) + extension
 
                 os.rename(download_torrent_tmp_path + '/' + original_torrent_filename, download_torrent_path + '/' + destination_torrent_filename)
-                driver.close()
                 return destination_torrent_filename
             else:
-                driver.close()
                 return None
 
 

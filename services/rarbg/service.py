@@ -162,21 +162,24 @@ def break_defence(url):
             driver.close()
             return None
     except NoSuchElementException:
-        time.sleep(6)
+        try:
+            time.sleep(6)
 
-        driver.save_screenshot(screenshot_filename)
-        make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
-        captcha_number = solve_captcha_number_from_image(captcha_filename)
+            driver.save_screenshot(screenshot_filename)
+            make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
+            captcha_number = solve_captcha_number_from_image(captcha_filename)
 
-        driver.find_element_by_id('solve_string').send_keys(captcha_number)
-        driver.find_element_by_id('button_submit').click()
+            driver.find_element_by_id('solve_string').send_keys(captcha_number)
+            driver.find_element_by_id('button_submit').click()
 
-        break_success = parse_break_defence_success(driver.page_source)
-        if break_success is True:
-            return driver
-        else:
-            driver.close()
-            return None
+            break_success = parse_break_defence_success(driver.page_source)
+            if break_success is True:
+                return driver
+            else:
+                driver.close()
+                return None
+        except NoSuchElementException:
+            pass
 
     return None
 
