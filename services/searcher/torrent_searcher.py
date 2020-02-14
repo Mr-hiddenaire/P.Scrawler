@@ -164,6 +164,8 @@ def torrent_download_for_rarbg(torrent_url, driver):
             driver.execute("send_command", params)
             driver.get(torrent_url)
 
+    time.sleep(5)
+
     while True:
         time.sleep(1)
 
