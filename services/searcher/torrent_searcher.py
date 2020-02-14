@@ -130,6 +130,7 @@ def torrent_download_for_rarbg(torrent_url, driver):
         time.sleep(1)
 
         if counter > 5:
+            driver.save_screenshot('test.png')
             driver.close()
             return None
 
