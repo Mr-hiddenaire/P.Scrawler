@@ -121,18 +121,15 @@ def torrent_download_for_rarbg(torrent_url, driver):
     if os.path.isdir(download_torrent_path) is False:
         raise FileNotFoundError('Download torrent directory does not exists')
 
-    time.sleep(6)
-
     try:
         driver.get(torrent_url)
         driver.find_element_by_link_text('Click here').click()
+
+        time.sleep(6)
+
         driver.save_screenshot(screenshot_filename)
         rarbg_service.make_screenshot_to_captcha_image(screenshot_filename, captcha_filename)
         captcha_number = rarbg_service.solve_captcha_number_from_image(captcha_filename)
-
-        if captcha_number is False:
-            driver.close()
-            return None
 
         driver.find_element_by_id('solve_string').send_keys(captcha_number)
         driver.find_element_by_id('button_submit').click()
@@ -149,10 +146,6 @@ def torrent_download_for_rarbg(torrent_url, driver):
             captcha_number = rarbg_service.solve_captcha_number_from_image(captcha_filename)
 
             driver.find_element_by_id('solve_string').send_keys(captcha_number)
-
-            if captcha_number is False:
-                driver.close()
-                return None
 
             driver.find_element_by_id('button_submit').click()
 
