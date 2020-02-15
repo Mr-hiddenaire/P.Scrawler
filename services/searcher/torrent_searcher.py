@@ -73,6 +73,9 @@ def torrent_download_for_library(torrent_url):
 
     driver.get(torrent_url)
 
+    """ wait to download finished """
+    time.sleep(5)
+
     while True:
         time.sleep(1)
 
