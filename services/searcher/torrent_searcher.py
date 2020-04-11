@@ -11,6 +11,8 @@ import time
 from random import randint
 from services.rarbg import service as rarbg_service
 import logging
+from urllib.parse import urlparse
+import re
 
 
 def find_torrent(unique_id):
@@ -35,7 +37,7 @@ def find_torrent(unique_id):
 
             func_name = 'parse_' + func_name
 
-            torrent_url = eval(func_name)(g_cse_item['link'])
+            torrent_url = eval(func_name)(g_cse_item['link'], unique_id)
 
             if torrent_url is not None:
                 torrent_path = torrent_download_for_library(torrent_url)
@@ -192,7 +194,7 @@ def torrent_download_for_rarbg(torrent_url, driver):
                 return None
 
 
-def parse_1337x(url):
+def parse_1337x(url, unique_id):
     """
     response = requests.get(url, headers={'User-Agent': base.USER_AGENT})
     doc = PyQuery(response.text)
@@ -227,10 +229,54 @@ def parse_1337x(url):
             return None
     else:
         driver.close()
-        return None
+        torrent_url = parse_1337x_extra(url, unique_id)
+        return torrent_url
 
 
-def parse_limetorrents(url):
+def parse_1337x_extra(url, unique_id):
+
+    """ driver initialization """
+    driver = browser.get_driver()
+
+    driver.get(url)
+    parsed_uri = urlparse(url)
+    domain = '{uri.scheme}://{uri.netloc}'.format(uri=parsed_uri)
+
+    new_url = domain + '/search/' + unique_id + '/1/'
+
+    driver.get(new_url)
+
+    doc = PyQuery(driver.page_source)
+
+    for html in doc('tbody tr').items():
+        doc = PyQuery(html)
+        page_url = doc('td a').eq(1).attr('href')
+        title = doc('td a').eq(1).text()
+
+        pattern = re.compile(unique_id)
+        result = re.findall(pattern, title)
+
+        if len(result) > 0:
+            driver.get(domain + page_url)
+
+            doc = PyQuery(driver.page_source)
+
+            download_url_html = doc('.dropdown-menu li').eq(0)
+
+            download_url_doc = doc(download_url_html)
+
+            torrent_url = download_url_doc('a').attr('href')
+
+            torrent_url = torrent_url.replace('http', 'https')
+
+            return torrent_url
+        else:
+            continue
+
+    return None
+
+
+def parse_limetorrents(url, unique_id):
     """
     response = requests.get(url, headers={'User-Agent': base.USER_AGENT})
 
