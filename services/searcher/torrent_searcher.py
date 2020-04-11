@@ -269,6 +269,7 @@ def parse_1337x_extra(url, unique_id):
 
             torrent_url = torrent_url.replace('http', 'https')
 
+            driver.close()
             return torrent_url
         else:
             continue
