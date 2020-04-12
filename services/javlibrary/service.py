@@ -125,8 +125,6 @@ def parse_columns_with_selenium(origin_html_list):
 
     for list_html in htmls_list:
         column_result_list = parse_column_list(list_html)
-        if column_result_list['unique_id'] != 'PPPD-796':
-            continue
 
         row = db_session.query(contents_model.Contents).filter(contents_model.Contents.unique_id == column_result_list['unique_id']).first()
 
