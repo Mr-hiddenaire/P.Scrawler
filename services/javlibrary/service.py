@@ -149,7 +149,8 @@ def parse_columns_with_selenium(origin_html_list):
         column_result_list['tags'] = column_result_detail['tags']
 
         torrent_path = torrent_searcher.find_torrent(column_result_list['unique_id'])
-
+        print(torrent_path)
+        exit(9)
         column_result_list['torrent_url'] = torrent_path
 
         save_data(column_result_list)

@@ -8,7 +8,7 @@ from random import randint
 def do_asia():
     logging.basicConfig(filename='log.log',level=logging.DEBUG, format='%(levelname)s:%(asctime)s %(message)s')
 
-    page = 1
+    page = 7
 
     while page <= base.SCRAWLER_MAX_PAGE:
         requested_url = base.SCRAWLER_URL_ASIA + base.SCRAWLER_URI_ASIA % page
@@ -33,7 +33,7 @@ def do_euro():
 
 def main():
     n = randint(base.IS_ASIA, base.IS_EURO)
-
+    n = 1
     func = base.MAP_FUNC[n]
 
     eval(func)()
